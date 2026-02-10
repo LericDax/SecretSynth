@@ -1,0 +1,82 @@
+name: Bug / Crash Intake
+description: Report crashes, host compatibility issues, and regressions.
+title: "[Bug]: "
+labels:
+  - bug
+  - triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Please include as much detail as possible.
+
+  - type: input
+    id: secretsynth_version
+    attributes:
+      label: SecretSynth version
+      description: Semantic version shown in plugin About dialog or release artifact.
+      placeholder: "e.g. 1.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: host_name
+    attributes:
+      label: Host / DAW
+      description: Host application where issue happened.
+      placeholder: "e.g. Ableton Live 12 Suite"
+    validations:
+      required: true
+
+  - type: input
+    id: os_system
+    attributes:
+      label: Operating system + architecture
+      description: Include exact OS version and CPU architecture.
+      placeholder: "e.g. macOS 14.6 (Apple Silicon)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro_steps
+    attributes:
+      label: Steps to reproduce
+      description: Numbered steps from clean project if possible.
+      placeholder: |
+        1. Open host...
+        2. Insert SecretSynth...
+        3. Change parameter...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_result
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual_result
+    attributes:
+      label: Actual result
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Crash logs / stack traces / screenshots
+      description: Paste or attach any diagnostics.
+
+  - type: dropdown
+    id: reproducibility
+    attributes:
+      label: Reproducibility
+      options:
+        - Always
+        - Sometimes
+        - Rarely
+        - Unable to reproduce reliably
+    validations:
+      required: true
