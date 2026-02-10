@@ -70,3 +70,24 @@ Paths can vary by generator, but Release artifacts are typically found under:
 - Release builds are enabled via standard `Release` configurations.
 - Plugin bundle metadata (`BUNDLE_ID`, manufacturer/plugin codes, versioning) is fixed and deterministic.
 - CI produces unsigned plugin bundles suitable for downstream code-signing/notarization in release pipelines.
+
+## Beta Release Packaging
+
+Use the release packaging scripts to create semantic-versioned beta artifacts:
+
+- Bash: `scripts/release/package-beta.sh`
+- PowerShell: `scripts/release/package-beta.ps1`
+
+Example names:
+
+- `SecretSynth-beta-v1.0.0-windows.zip`
+- `SecretSynth-beta-v1.0.0-macos.zip`
+
+## Release Docs
+
+- Quickstart install: `docs/release/quickstart-install.md`
+- Known issues: `docs/release/known-issues.md`
+- Release checklist: `docs/release/release-checklist.md`
+- Public v1.0 go/no-go: `docs/release/go-no-go-v1.md`
+- Changelog: `CHANGELOG.md`
+
