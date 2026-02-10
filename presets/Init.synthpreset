@@ -1,0 +1,9 @@
+{
+  "name": "Init",
+  "version": 1,
+  "oscillator": {
+    "waveform": "sine",
+    "frequencyHz": 220.0,
+    "gain": 0.1
+  }
+}

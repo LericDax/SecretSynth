@@ -39,3 +39,15 @@
 
 # debug information files
 *.dwo
+
+# Build folders
+/build/
+/.idea/
+/.vscode/
+
+# JUCE/CMake intermediates
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+Makefile
