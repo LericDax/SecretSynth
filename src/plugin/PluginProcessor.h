@@ -4,6 +4,7 @@
 #include "../dsp/filter/MultiModeFilter.h"
 #include "../dsp/osc/PhaseWarpOscillator.h"
 #include "../dsp/mod/Modulation.h"
+#include "parameters/StateSerialization.h"
 
 namespace secretsynth::plugin
 {
@@ -46,6 +47,7 @@ private:
     };
 
     static float softLimit (float sample) noexcept;
+    void applyStateToEngine();
 
     secretsynth::dsp::osc::PhaseWarpOscillator oscillator;
     secretsynth::dsp::filter::MultiModeFilter filter;
@@ -56,6 +58,7 @@ private:
     float oscillatorMixGain { 1.0f };
     int activeVoices { 0 };
     float lastKeyFrequencyHz { 220.0f };
+    parameters::PluginState pluginState { parameters::makeDefaultState() };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SecretSynthAudioProcessor)
 };

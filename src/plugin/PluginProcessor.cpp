@@ -15,6 +15,15 @@ SecretSynthAudioProcessor::SecretSynthAudioProcessor()
 {
 }
 
+
+void SecretSynthAudioProcessor::applyStateToEngine()
+{
+    oscillator.setFrequency (pluginState.values[static_cast<std::size_t> (parameters::ParameterId::oscillatorFrequency)]);
+    oscillator.setPdAmount (pluginState.values[static_cast<std::size_t> (parameters::ParameterId::oscillatorPdAmount)]);
+    filter.setCutoffHz (pluginState.values[static_cast<std::size_t> (parameters::ParameterId::filterCutoffHz)]);
+    oscillatorMixGain = pluginState.values[static_cast<std::size_t> (parameters::ParameterId::outputGain)];
+}
+
 void SecretSynthAudioProcessor::prepareToPlay (double sampleRate, int)
 {
     modulationEngine.setSampleRate (sampleRate);
@@ -41,10 +50,8 @@ void SecretSynthAudioProcessor::prepareToPlay (double sampleRate, int)
 
     oscillator.prepare (sampleRate);
     oscillator.reset();
-    oscillator.setFrequency (220.0f);
     oscillator.setTune (0.0f);
     oscillator.setFine (0.0f);
-    oscillator.setPdAmount (0.6f);
     oscillator.setPdShape (0.5f);
     oscillator.setMix (1.0f);
     oscillator.setQualityMode (secretsynth::dsp::osc::PhaseWarpOscillator::QualityMode::high);
@@ -52,15 +59,15 @@ void SecretSynthAudioProcessor::prepareToPlay (double sampleRate, int)
     filter.prepare (sampleRate);
     filter.reset();
     filter.setMode (secretsynth::dsp::filter::MultiModeFilter::Mode::lowPass);
-    filter.setCutoffHz (1800.0f);
     filter.setResonance (0.6f);
     filter.setKeyTracking (0.5f);
     filter.setKeyTrackingReferenceHz (440.0f);
 
     filterPosition = FilterPosition::postOscMix;
-    oscillatorMixGain = 1.0f;
     activeVoices = 1;
     lastKeyFrequencyHz = 220.0f;
+
+    applyStateToEngine();
 }
 
 void SecretSynthAudioProcessor::releaseResources() {}
@@ -97,8 +104,10 @@ void SecretSynthAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         const auto cutoffMod = destinations[static_cast<std::size_t> (secretsynth::dsp::mod::Destination::filterCutoff)];
         activeVoices = (ampMod > 1.0e-4f ? 1 : 0);
 
-        oscillator.setPdAmount (juce::jlimit (0.0f, 1.0f, 0.6f + pdAmountMod));
-        filter.setCutoffHz (juce::jlimit (20.0f, 20000.0f, 1800.0f + 8000.0f * cutoffMod));
+        const auto basePdAmount = pluginState.values[static_cast<std::size_t> (parameters::ParameterId::oscillatorPdAmount)];
+        const auto baseCutoff = pluginState.values[static_cast<std::size_t> (parameters::ParameterId::filterCutoffHz)];
+        oscillator.setPdAmount (juce::jlimit (0.0f, 1.0f, basePdAmount + pdAmountMod));
+        filter.setCutoffHz (juce::jlimit (20.0f, 20000.0f, baseCutoff + 8000.0f * cutoffMod));
 
         float oscillatorSample = oscillator.renderSample() * 0.1f;
 
@@ -181,25 +190,30 @@ void SecretSynthAudioProcessor::changeProgramName (int, const juce::String&) {}
 
 void SecretSynthAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    juce::String state;
-    state << "frequency=220\n";
-    state << modulationMatrix.serialize();
-
     juce::MemoryOutputStream stream (destData, true);
-    stream.writeString (state);
+    stream.writeString (parameters::serializeState (pluginState));
+    stream.writeString (modulationMatrix.serialize());
 }
 
 void SecretSynthAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    const auto state = juce::String::fromUTF8 (static_cast<const char*> (data), sizeInBytes);
-    const auto lines = juce::StringArray::fromLines (state);
+    const auto stateText = juce::String::fromUTF8 (static_cast<const char*> (data), sizeInBytes);
+    const auto lines = juce::StringArray::fromLines (stateText);
 
+    juce::String parameterStateText;
     juce::String modulationText;
+
     for (const auto& line : lines)
     {
+        if (line.startsWith ("state.version=") || line.startsWith ("osc.") || line.startsWith ("filter.") || line.startsWith ("output."))
+            parameterStateText << line << "\n";
+
         if (line.startsWith ("schema=") || line.startsWith ("routes=") || line.containsChar (','))
             modulationText << line << "\n";
     }
+
+    pluginState = parameters::deserializeState (parameterStateText.toStdString());
+    applyStateToEngine();
 
     if (! modulationText.isEmpty())
         modulationMatrix.deserialize (modulationText.toStdString());
