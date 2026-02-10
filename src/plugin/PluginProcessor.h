@@ -1,9 +1,11 @@
 #pragma once
 
+#include <atomic>
+
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "../dsp/filter/MultiModeFilter.h"
-#include "../dsp/osc/PhaseWarpOscillator.h"
 #include "../dsp/mod/Modulation.h"
+#include "../dsp/osc/PhaseWarpOscillator.h"
 #include "parameters/StateSerialization.h"
 
 namespace secretsynth::plugin
@@ -11,6 +13,13 @@ namespace secretsynth::plugin
 class SecretSynthAudioProcessor : public juce::AudioProcessor
 {
 public:
+    struct UiModulationState
+    {
+        float pdAmount { 0.0f };
+        float filterCutoff { 0.0f };
+        float amp { 0.0f };
+    };
+
     SecretSynthAudioProcessor();
     ~SecretSynthAudioProcessor() override = default;
 
@@ -39,6 +48,9 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    juce::AudioProcessorValueTreeState& getValueTreeState() noexcept { return valueTreeState; }
+    UiModulationState getUiModulationState() const noexcept;
+
 private:
     enum class FilterPosition
     {
@@ -48,6 +60,8 @@ private:
 
     static float softLimit (float sample) noexcept;
     void applyStateToEngine();
+    static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    float getParameterValue (parameters::ParameterId id) const noexcept;
 
     secretsynth::dsp::osc::PhaseWarpOscillator oscillator;
     secretsynth::dsp::filter::MultiModeFilter filter;
@@ -59,6 +73,11 @@ private:
     int activeVoices { 0 };
     float lastKeyFrequencyHz { 220.0f };
     parameters::PluginState pluginState { parameters::makeDefaultState() };
+    juce::AudioProcessorValueTreeState valueTreeState;
+
+    std::atomic<float> uiPdAmountMod { 0.0f };
+    std::atomic<float> uiFilterCutoffMod { 0.0f };
+    std::atomic<float> uiAmpMod { 0.0f };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SecretSynthAudioProcessor)
 };

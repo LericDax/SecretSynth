@@ -5,23 +5,74 @@
 
 namespace secretsynth::plugin
 {
+namespace
+{
+juce::NormalisableRange<float> makeRange (const parameters::ParameterSpec& spec)
+{
+    if (spec.maximum > 1000.0f)
+        return { spec.minimum, spec.maximum, 0.0f, 0.35f };
+
+    return { spec.minimum, spec.maximum };
+}
+} // namespace
+
 float SecretSynthAudioProcessor::softLimit (float sample) noexcept
 {
     return std::tanh (sample);
 }
 
 SecretSynthAudioProcessor::SecretSynthAudioProcessor()
-    : AudioProcessor (BusesProperties().withOutput ("Output", juce::AudioChannelSet::stereo(), true))
+    : AudioProcessor (BusesProperties().withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
+      valueTreeState (*this, nullptr, "SecretSynthParameters", createParameterLayout())
 {
 }
 
+juce::AudioProcessorValueTreeState::ParameterLayout SecretSynthAudioProcessor::createParameterLayout()
+{
+    std::vector<std::unique_ptr<juce::RangedAudioParameter>> layout;
+    layout.reserve (parameters::parameterSpecs.size());
+
+    for (const auto& spec : parameters::parameterSpecs)
+    {
+        layout.push_back (std::make_unique<juce::AudioParameterFloat> (juce::ParameterID { spec.stableId.data(), 1 },
+                                                                        juce::String (spec.stableId.data()),
+                                                                        makeRange (spec),
+                                                                        spec.defaultValue));
+    }
+
+    return { layout.begin(), layout.end() };
+}
+
+float SecretSynthAudioProcessor::getParameterValue (parameters::ParameterId id) const noexcept
+{
+    const auto& spec = parameters::getSpec (id);
+    if (const auto* value = valueTreeState.getRawParameterValue (juce::String (spec.stableId.data())))
+        return value->load();
+
+    return spec.defaultValue;
+}
 
 void SecretSynthAudioProcessor::applyStateToEngine()
 {
-    oscillator.setFrequency (pluginState.values[static_cast<std::size_t> (parameters::ParameterId::oscillatorFrequency)]);
-    oscillator.setPdAmount (pluginState.values[static_cast<std::size_t> (parameters::ParameterId::oscillatorPdAmount)]);
-    filter.setCutoffHz (pluginState.values[static_cast<std::size_t> (parameters::ParameterId::filterCutoffHz)]);
-    oscillatorMixGain = pluginState.values[static_cast<std::size_t> (parameters::ParameterId::outputGain)];
+    oscillator.setFrequency (getParameterValue (parameters::ParameterId::oscillatorFrequency));
+    oscillator.setPdAmount (getParameterValue (parameters::ParameterId::oscillatorPdAmount));
+    oscillator.setPdShape (getParameterValue (parameters::ParameterId::oscillatorPdShape));
+    oscillator.setTune (getParameterValue (parameters::ParameterId::oscillatorTune));
+    oscillator.setFine (getParameterValue (parameters::ParameterId::oscillatorFine));
+    oscillator.setMix (getParameterValue (parameters::ParameterId::oscillatorMix));
+
+    filter.setCutoffHz (getParameterValue (parameters::ParameterId::filterCutoffHz));
+    filter.setResonance (getParameterValue (parameters::ParameterId::filterResonance));
+
+    modulationEngine.lfo1.setRateHz (getParameterValue (parameters::ParameterId::modLfo1RateHz));
+    modulationEngine.lfo2.setRateHz (getParameterValue (parameters::ParameterId::modLfo2RateHz));
+
+    modulationEngine.ampEnv.setParameters ({ getParameterValue (parameters::ParameterId::ampAttackSeconds),
+                                             0.12f,
+                                             0.9f,
+                                             getParameterValue (parameters::ParameterId::ampReleaseSeconds) });
+
+    oscillatorMixGain = getParameterValue (parameters::ParameterId::outputGain);
 }
 
 void SecretSynthAudioProcessor::prepareToPlay (double sampleRate, int)
@@ -50,16 +101,11 @@ void SecretSynthAudioProcessor::prepareToPlay (double sampleRate, int)
 
     oscillator.prepare (sampleRate);
     oscillator.reset();
-    oscillator.setTune (0.0f);
-    oscillator.setFine (0.0f);
-    oscillator.setPdShape (0.5f);
-    oscillator.setMix (1.0f);
     oscillator.setQualityMode (secretsynth::dsp::osc::PhaseWarpOscillator::QualityMode::high);
 
     filter.prepare (sampleRate);
     filter.reset();
     filter.setMode (secretsynth::dsp::filter::MultiModeFilter::Mode::lowPass);
-    filter.setResonance (0.6f);
     filter.setKeyTracking (0.5f);
     filter.setKeyTrackingReferenceHz (440.0f);
 
@@ -81,6 +127,8 @@ bool SecretSynthAudioProcessor::isBusesLayoutSupported (const BusesLayout& layou
 void SecretSynthAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
 {
     juce::ScopedNoDenormals noDenormals;
+
+    applyStateToEngine();
 
     for (int channel = 0; channel < buffer.getNumChannels(); ++channel)
         buffer.clear (channel, 0, buffer.getNumSamples());
@@ -104,8 +152,8 @@ void SecretSynthAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         const auto cutoffMod = destinations[static_cast<std::size_t> (secretsynth::dsp::mod::Destination::filterCutoff)];
         activeVoices = (ampMod > 1.0e-4f ? 1 : 0);
 
-        const auto basePdAmount = pluginState.values[static_cast<std::size_t> (parameters::ParameterId::oscillatorPdAmount)];
-        const auto baseCutoff = pluginState.values[static_cast<std::size_t> (parameters::ParameterId::filterCutoffHz)];
+        const auto basePdAmount = getParameterValue (parameters::ParameterId::oscillatorPdAmount);
+        const auto baseCutoff = getParameterValue (parameters::ParameterId::filterCutoffHz);
         oscillator.setPdAmount (juce::jlimit (0.0f, 1.0f, basePdAmount + pdAmountMod));
         filter.setCutoffHz (juce::jlimit (20.0f, 20000.0f, baseCutoff + 8000.0f * cutoffMod));
 
@@ -131,7 +179,18 @@ void SecretSynthAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
 
         for (int channel = 0; channel < buffer.getNumChannels(); ++channel)
             buffer.setSample (channel, sample, value);
+
+        uiPdAmountMod.store (pdAmountMod, std::memory_order_relaxed);
+        uiFilterCutoffMod.store (cutoffMod, std::memory_order_relaxed);
+        uiAmpMod.store (ampMod, std::memory_order_relaxed);
     }
+}
+
+SecretSynthAudioProcessor::UiModulationState SecretSynthAudioProcessor::getUiModulationState() const noexcept
+{
+    return { uiPdAmountMod.load (std::memory_order_relaxed),
+             uiFilterCutoffMod.load (std::memory_order_relaxed),
+             uiAmpMod.load (std::memory_order_relaxed) };
 }
 
 juce::AudioProcessorEditor* SecretSynthAudioProcessor::createEditor()
@@ -190,6 +249,11 @@ void SecretSynthAudioProcessor::changeProgramName (int, const juce::String&) {}
 
 void SecretSynthAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
+    for (const auto& spec : parameters::parameterSpecs)
+    {
+        pluginState.values[static_cast<std::size_t> (spec.id)] = getParameterValue (spec.id);
+    }
+
     juce::MemoryOutputStream stream (destData, true);
     stream.writeString (parameters::serializeState (pluginState));
     stream.writeString (modulationMatrix.serialize());
@@ -205,7 +269,7 @@ void SecretSynthAudioProcessor::setStateInformation (const void* data, int sizeI
 
     for (const auto& line : lines)
     {
-        if (line.startsWith ("state.version=") || line.startsWith ("osc.") || line.startsWith ("filter.") || line.startsWith ("output."))
+        if (line.startsWith ("state.version=") || line.startsWith ("osc.") || line.startsWith ("filter.") || line.startsWith ("output.") || line.startsWith ("mod.") || line.startsWith ("amp.") || line.startsWith ("performance."))
             parameterStateText << line << "\n";
 
         if (line.startsWith ("schema=") || line.startsWith ("routes=") || line.containsChar (','))
@@ -213,6 +277,14 @@ void SecretSynthAudioProcessor::setStateInformation (const void* data, int sizeI
     }
 
     pluginState = parameters::deserializeState (parameterStateText.toStdString());
+
+    for (const auto& spec : parameters::parameterSpecs)
+    {
+        const auto value = parameters::clampToRange (spec.id, pluginState.values[static_cast<std::size_t> (spec.id)]);
+        valueTreeState.getParameter (juce::String (spec.stableId.data()))->setValueNotifyingHost (
+            valueTreeState.getParameterRange (juce::String (spec.stableId.data())).convertTo0to1 (value));
+    }
+
     applyStateToEngine();
 
     if (! modulationText.isEmpty())
