@@ -1,0 +1,59 @@
+{
+  "name": "Bell Keys",
+  "version": 1,
+  "metadata": {
+    "author": "SecretSynth Factory Team",
+    "category": "keys",
+    "description": "Keys preset: Bell Keys. Gain-staged and macro-ready for production sketching."
+  },
+  "oscillator": {
+    "waveform": "triangle",
+    "frequencyHz": 392.0,
+    "gain": 0.075
+  },
+  "envelope": {
+    "attackMs": 5,
+    "decayMs": 480,
+    "sustain": 0.65,
+    "releaseMs": 900
+  },
+  "normalization": {
+    "targetPeakDbfs": -6.0,
+    "outputTrimDb": -2.2,
+    "notes": "Patch gain calibrated to keep mix-ready headroom."
+  },
+  "macros": [
+    {
+      "id": 1,
+      "name": "Tone",
+      "target": "filterCutoff",
+      "amount": 0.65,
+      "default": 0.45
+    },
+    {
+      "id": 2,
+      "name": "Motion",
+      "target": "lfoDepth",
+      "amount": 0.55,
+      "default": 0.2
+    },
+    {
+      "id": 3,
+      "name": "Space",
+      "target": "reverbMix",
+      "amount": 0.7,
+      "default": 0.25
+    },
+    {
+      "id": 4,
+      "name": "Drive",
+      "target": "saturation",
+      "amount": 0.6,
+      "default": 0.15
+    }
+  ],
+  "sanity": {
+    "estimatedCpuScore": 1.42,
+    "expectedLoudnessLufsShortTerm": -17.5
+  }
+}

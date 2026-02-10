@@ -1,0 +1,372 @@
+{
+  "totalPresets": 60,
+  "categoryCounts": {
+    "bass": 12,
+    "fx": 12,
+    "keys": 12,
+    "pad": 12,
+    "pluck": 12
+  },
+  "presets": [
+    {
+      "file": "bass_01_sub-anchor.synthpreset",
+      "name": "Sub Anchor",
+      "category": "bass",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "bass_02_drive-mono.synthpreset",
+      "name": "Drive Mono",
+      "category": "bass",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "bass_03_rubber-low.synthpreset",
+      "name": "Rubber Low",
+      "category": "bass",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "bass_04_fm-growl.synthpreset",
+      "name": "FM Growl",
+      "category": "bass",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "bass_05_deep-pulse.synthpreset",
+      "name": "Deep Pulse",
+      "category": "bass",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "bass_06_round-analog.synthpreset",
+      "name": "Round Analog",
+      "category": "bass",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "bass_07_low-plucker.synthpreset",
+      "name": "Low Plucker",
+      "category": "bass",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "bass_08_acid-bite.synthpreset",
+      "name": "Acid Bite",
+      "category": "bass",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "bass_09_solid-fifth.synthpreset",
+      "name": "Solid Fifth",
+      "category": "bass",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "bass_10_muted-dirt.synthpreset",
+      "name": "Muted Dirt",
+      "category": "bass",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "bass_11_velvet-sub.synthpreset",
+      "name": "Velvet Sub",
+      "category": "bass",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "bass_12_wide-mono.synthpreset",
+      "name": "Wide Mono",
+      "category": "bass",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "fx_01_riser-thin.synthpreset",
+      "name": "Riser Thin",
+      "category": "fx",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "fx_02_falling-bit.synthpreset",
+      "name": "Falling Bit",
+      "category": "fx",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "fx_03_noise-burst.synthpreset",
+      "name": "Noise Burst",
+      "category": "fx",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "fx_04_laser-zap.synthpreset",
+      "name": "Laser Zap",
+      "category": "fx",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "fx_05_impact-tone.synthpreset",
+      "name": "Impact Tone",
+      "category": "fx",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "fx_06_sci-sweep.synthpreset",
+      "name": "Sci Sweep",
+      "category": "fx",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "fx_07_glitch-ping.synthpreset",
+      "name": "Glitch Ping",
+      "category": "fx",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "fx_08_drone-spark.synthpreset",
+      "name": "Drone Spark",
+      "category": "fx",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "fx_09_metal-drop.synthpreset",
+      "name": "Metal Drop",
+      "category": "fx",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "fx_10_retro-beam.synthpreset",
+      "name": "Retro Beam",
+      "category": "fx",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "fx_11_ghost-hit.synthpreset",
+      "name": "Ghost Hit",
+      "category": "fx",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "fx_12_warp-spark.synthpreset",
+      "name": "Warp Spark",
+      "category": "fx",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "keys_01_soft-ep.synthpreset",
+      "name": "Soft EP",
+      "category": "keys",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "keys_02_bright-ep.synthpreset",
+      "name": "Bright EP",
+      "category": "keys",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "keys_03_stage-keys.synthpreset",
+      "name": "Stage Keys",
+      "category": "keys",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "keys_04_tape-piano.synthpreset",
+      "name": "Tape Piano",
+      "category": "keys",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "keys_05_mellow-clav.synthpreset",
+      "name": "Mellow Clav",
+      "category": "keys",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "keys_06_lounge-keys.synthpreset",
+      "name": "Lounge Keys",
+      "category": "keys",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "keys_07_hammer-tone.synthpreset",
+      "name": "Hammer Tone",
+      "category": "keys",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "keys_08_bell-keys.synthpreset",
+      "name": "Bell Keys",
+      "category": "keys",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "keys_09_dusty-reed.synthpreset",
+      "name": "Dusty Reed",
+      "category": "keys",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "keys_10_neo-piano.synthpreset",
+      "name": "Neo Piano",
+      "category": "keys",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "keys_11_house-keys.synthpreset",
+      "name": "House Keys",
+      "category": "keys",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "keys_12_warm-tines.synthpreset",
+      "name": "Warm Tines",
+      "category": "keys",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pad_01_cloud-wash.synthpreset",
+      "name": "Cloud Wash",
+      "category": "pad",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pad_02_noir-drift.synthpreset",
+      "name": "Noir Drift",
+      "category": "pad",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pad_03_aurora-bed.synthpreset",
+      "name": "Aurora Bed",
+      "category": "pad",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pad_04_velour-sky.synthpreset",
+      "name": "Velour Sky",
+      "category": "pad",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pad_05_horizon-soft.synthpreset",
+      "name": "Horizon Soft",
+      "category": "pad",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pad_06_frozen-air.synthpreset",
+      "name": "Frozen Air",
+      "category": "pad",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pad_07_warm-bloom.synthpreset",
+      "name": "Warm Bloom",
+      "category": "pad",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pad_08_pastel-choir.synthpreset",
+      "name": "Pastel Choir",
+      "category": "pad",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pad_09_wide-dust.synthpreset",
+      "name": "Wide Dust",
+      "category": "pad",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pad_10_night-veil.synthpreset",
+      "name": "Night Veil",
+      "category": "pad",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pad_11_amber-field.synthpreset",
+      "name": "Amber Field",
+      "category": "pad",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pad_12_slow-halo.synthpreset",
+      "name": "Slow Halo",
+      "category": "pad",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pluck_01_glass-pick.synthpreset",
+      "name": "Glass Pick",
+      "category": "pluck",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pluck_02_muted-bell.synthpreset",
+      "name": "Muted Bell",
+      "category": "pluck",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pluck_03_nylon-pop.synthpreset",
+      "name": "Nylon Pop",
+      "category": "pluck",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pluck_04_spark-string.synthpreset",
+      "name": "Spark String",
+      "category": "pluck",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pluck_05_wire-hit.synthpreset",
+      "name": "Wire Hit",
+      "category": "pluck",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pluck_06_tiny-harp.synthpreset",
+      "name": "Tiny Harp",
+      "category": "pluck",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pluck_07_steel-dot.synthpreset",
+      "name": "Steel Dot",
+      "category": "pluck",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pluck_08_short-chime.synthpreset",
+      "name": "Short Chime",
+      "category": "pluck",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pluck_09_tine-tap.synthpreset",
+      "name": "Tine Tap",
+      "category": "pluck",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pluck_10_pulse-pick.synthpreset",
+      "name": "Pulse Pick",
+      "category": "pluck",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pluck_11_snap-arp.synthpreset",
+      "name": "Snap Arp",
+      "category": "pluck",
+      "author": "SecretSynth Factory Team"
+    },
+    {
+      "file": "pluck_12_dry-plectrum.synthpreset",
+      "name": "Dry Plectrum",
+      "category": "pluck",
+      "author": "SecretSynth Factory Team"
+    }
+  ]
+}
