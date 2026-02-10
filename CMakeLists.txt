@@ -49,6 +49,8 @@ juce_generate_juce_header(${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME}
     PRIVATE
+        src/dsp/osc/PhaseWarpOscillator.cpp
+        src/dsp/osc/PhaseWarpOscillator.h
         src/dsp/SimpleVoice.cpp
         src/dsp/SimpleVoice.h
         src/plugin/PluginEditor.cpp
@@ -79,9 +81,20 @@ enable_testing()
 
 add_executable(secretsynth_dsp_tests
     tests/test_simple_voice.cpp
+    tests/dsp/test_phase_warp_oscillator.cpp
+    src/dsp/osc/PhaseWarpOscillator.cpp
+    src/dsp/osc/PhaseWarpOscillator.h
     src/dsp/SimpleVoice.cpp
     src/dsp/SimpleVoice.h
 )
 
 target_compile_features(secretsynth_dsp_tests PRIVATE cxx_std_20)
 add_test(NAME secretsynth_dsp_tests COMMAND secretsynth_dsp_tests)
+
+add_executable(secretsynth_osc_benchmark
+    tools/osc_quality_benchmark.cpp
+    src/dsp/osc/PhaseWarpOscillator.cpp
+    src/dsp/osc/PhaseWarpOscillator.h
+)
+
+target_compile_features(secretsynth_osc_benchmark PRIVATE cxx_std_20)

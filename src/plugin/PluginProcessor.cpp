@@ -13,6 +13,12 @@ void SecretSynthAudioProcessor::prepareToPlay (double sampleRate, int)
     oscillator.prepare (sampleRate);
     oscillator.reset();
     oscillator.setFrequency (220.0f);
+    oscillator.setTune (0.0f);
+    oscillator.setFine (0.0f);
+    oscillator.setPdAmount (0.6f);
+    oscillator.setPdShape (0.5f);
+    oscillator.setMix (1.0f);
+    oscillator.setQualityMode (secretsynth::dsp::osc::PhaseWarpOscillator::QualityMode::high);
 }
 
 void SecretSynthAudioProcessor::releaseResources() {}
