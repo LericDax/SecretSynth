@@ -13,7 +13,7 @@ struct PluginState
     std::array<float, parameterCount> values {};
 };
 
-inline constexpr int currentStateVersion = 1;
+inline constexpr int currentStateVersion = 2;
 
 PluginState makeDefaultState() noexcept;
 std::string serializeState (const PluginState& state);
