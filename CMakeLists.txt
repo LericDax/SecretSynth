@@ -53,6 +53,10 @@ target_sources(${PROJECT_NAME}
         src/dsp/osc/PhaseWarpOscillator.h
         src/dsp/SimpleVoice.cpp
         src/dsp/SimpleVoice.h
+        src/dsp/voice/Voice.cpp
+        src/dsp/voice/Voice.h
+        src/dsp/voice/VoiceManager.cpp
+        src/dsp/voice/VoiceManager.h
         src/plugin/PluginEditor.cpp
         src/plugin/PluginEditor.h
         src/plugin/PluginProcessor.cpp
@@ -98,3 +102,14 @@ add_executable(secretsynth_osc_benchmark
 )
 
 target_compile_features(secretsynth_osc_benchmark PRIVATE cxx_std_20)
+
+add_executable(secretsynth_voice_tests
+    tests/dsp/test_voice_manager.cpp
+    src/dsp/voice/Voice.cpp
+    src/dsp/voice/Voice.h
+    src/dsp/voice/VoiceManager.cpp
+    src/dsp/voice/VoiceManager.h
+)
+
+target_compile_features(secretsynth_voice_tests PRIVATE cxx_std_20)
+add_test(NAME secretsynth_voice_tests COMMAND secretsynth_voice_tests)
