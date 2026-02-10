@@ -53,6 +53,8 @@ target_sources(${PROJECT_NAME}
         src/dsp/osc/PhaseWarpOscillator.h
         src/dsp/SimpleVoice.cpp
         src/dsp/SimpleVoice.h
+        src/dsp/mod/Modulation.cpp
+        src/dsp/mod/Modulation.h
         src/dsp/voice/Voice.cpp
         src/dsp/voice/Voice.h
         src/dsp/voice/VoiceManager.cpp
@@ -113,3 +115,12 @@ add_executable(secretsynth_voice_tests
 
 target_compile_features(secretsynth_voice_tests PRIVATE cxx_std_20)
 add_test(NAME secretsynth_voice_tests COMMAND secretsynth_voice_tests)
+
+add_executable(secretsynth_modulation_tests
+    tests/dsp/test_modulation.cpp
+    src/dsp/mod/Modulation.cpp
+    src/dsp/mod/Modulation.h
+)
+
+target_compile_features(secretsynth_modulation_tests PRIVATE cxx_std_20)
+add_test(NAME secretsynth_modulation_tests COMMAND secretsynth_modulation_tests)

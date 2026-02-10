@@ -2,6 +2,7 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "../dsp/osc/PhaseWarpOscillator.h"
+#include "../dsp/mod/Modulation.h"
 
 namespace secretsynth::plugin
 {
@@ -38,6 +39,8 @@ public:
 
 private:
     secretsynth::dsp::osc::PhaseWarpOscillator oscillator;
+    secretsynth::dsp::mod::ModulationMatrix modulationMatrix;
+    secretsynth::dsp::mod::ModulationEngine modulationEngine;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SecretSynthAudioProcessor)
 };
