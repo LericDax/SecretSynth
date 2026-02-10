@@ -37,6 +37,8 @@ Plugin identifiers and versions are centralized in `cmake/PluginIdentity.cmake`:
 
 Update all of these in one place when cutting releases to preserve host compatibility.
 
+State/preset compatibility rules for parameter IDs, index stability, and migration are documented in `docs/compatibility-policy.md`.
+
 ## Local Build
 
 ### Windows (VST3)

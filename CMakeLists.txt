@@ -65,6 +65,10 @@ target_sources(${PROJECT_NAME}
         src/plugin/PluginEditor.h
         src/plugin/PluginProcessor.cpp
         src/plugin/PluginProcessor.h
+        src/plugin/parameters/ParameterRegistry.cpp
+        src/plugin/parameters/ParameterRegistry.h
+        src/plugin/parameters/StateSerialization.cpp
+        src/plugin/parameters/StateSerialization.h
         src/ui/MainEditorComponent.cpp
         src/ui/MainEditorComponent.h
 )
@@ -135,3 +139,15 @@ add_executable(secretsynth_filter_tests
 
 target_compile_features(secretsynth_filter_tests PRIVATE cxx_std_20)
 add_test(NAME secretsynth_filter_tests COMMAND secretsynth_filter_tests)
+
+
+add_executable(secretsynth_state_tests
+    tests/plugin/test_state_serialization.cpp
+    src/plugin/parameters/ParameterRegistry.cpp
+    src/plugin/parameters/ParameterRegistry.h
+    src/plugin/parameters/StateSerialization.cpp
+    src/plugin/parameters/StateSerialization.h
+)
+
+target_compile_features(secretsynth_state_tests PRIVATE cxx_std_20)
+add_test(NAME secretsynth_state_tests COMMAND secretsynth_state_tests)
