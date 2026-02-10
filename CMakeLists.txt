@@ -51,6 +51,8 @@ target_sources(${PROJECT_NAME}
     PRIVATE
         src/dsp/osc/PhaseWarpOscillator.cpp
         src/dsp/osc/PhaseWarpOscillator.h
+        src/dsp/filter/MultiModeFilter.cpp
+        src/dsp/filter/MultiModeFilter.h
         src/dsp/SimpleVoice.cpp
         src/dsp/SimpleVoice.h
         src/dsp/mod/Modulation.cpp
@@ -124,3 +126,12 @@ add_executable(secretsynth_modulation_tests
 
 target_compile_features(secretsynth_modulation_tests PRIVATE cxx_std_20)
 add_test(NAME secretsynth_modulation_tests COMMAND secretsynth_modulation_tests)
+
+add_executable(secretsynth_filter_tests
+    tests/dsp/test_filter.cpp
+    src/dsp/filter/MultiModeFilter.cpp
+    src/dsp/filter/MultiModeFilter.h
+)
+
+target_compile_features(secretsynth_filter_tests PRIVATE cxx_std_20)
+add_test(NAME secretsynth_filter_tests COMMAND secretsynth_filter_tests)
