@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <charconv>
 #include <cmath>
+#include <cerrno>
 #include <cstdlib>
 #include <sstream>
 
