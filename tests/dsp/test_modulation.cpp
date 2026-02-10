@@ -13,6 +13,25 @@ bool almostEqual (float a, float b, float tolerance)
     return std::abs (a - b) <= tolerance;
 }
 
+bool routesEqual (const std::vector<Route>& lhs, const std::vector<Route>& rhs)
+{
+    if (lhs.size() != rhs.size())
+        return false;
+
+    for (std::size_t i = 0; i < lhs.size(); ++i)
+    {
+        if (lhs[i].source != rhs[i].source
+            || lhs[i].destination != rhs[i].destination
+            || ! almostEqual (lhs[i].depth, rhs[i].depth, 1.0e-6f)
+            || lhs[i].bipolar != rhs[i].bipolar)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool testDepthScaling()
 {
     ModulationMatrix matrix;
@@ -136,6 +155,132 @@ bool testSerializationRoundTrip()
 
     return true;
 }
+
+bool testDeserializeRejectsMalformedHeader()
+{
+    ModulationMatrix matrix;
+    matrix.addRoute ({ Source::ampEnv, Destination::amp, 0.25f, false });
+    const auto originalRoutes = matrix.getRoutes();
+
+    if (matrix.deserialize ("schema=abc\nroutes=0\n"))
+    {
+        std::cerr << "Expected malformed schema to fail deserialize.\n";
+        return false;
+    }
+
+    if (! routesEqual (matrix.getRoutes(), originalRoutes))
+    {
+        std::cerr << "Malformed schema should not mutate routes.\n";
+        return false;
+    }
+
+    return true;
+}
+
+bool testDeserializeRejectsMismatchedRouteCount()
+{
+    ModulationMatrix matrix;
+    matrix.addRoute ({ Source::lfo1, Destination::pitch, 0.5f, true });
+    const auto originalRoutes = matrix.getRoutes();
+
+    if (matrix.deserialize ("schema=1\nroutes=2\n0,0,0.5,1\n"))
+    {
+        std::cerr << "Expected missing route line to fail deserialize.\n";
+        return false;
+    }
+
+    if (! routesEqual (matrix.getRoutes(), originalRoutes))
+    {
+        std::cerr << "Missing route line should not mutate routes.\n";
+        return false;
+    }
+
+    if (matrix.deserialize ("schema=1\nroutes=1\n0,0,0.5,1\n1,1,0.25,0\n"))
+    {
+        std::cerr << "Expected extra route line to fail deserialize.\n";
+        return false;
+    }
+
+    if (! routesEqual (matrix.getRoutes(), originalRoutes))
+    {
+        std::cerr << "Extra route line should not mutate routes.\n";
+        return false;
+    }
+
+    return true;
+}
+
+bool testDeserializeRejectsMalformedRouteLines()
+{
+    ModulationMatrix matrix;
+    matrix.addRoute ({ Source::modEnv, Destination::filterCutoff, 0.4f, false });
+    const auto originalRoutes = matrix.getRoutes();
+
+    if (matrix.deserialize ("schema=1\nroutes=1\n0,1,0.5\n"))
+    {
+        std::cerr << "Expected malformed route with missing field to fail deserialize.\n";
+        return false;
+    }
+
+    if (matrix.deserialize ("schema=1\nroutes=1\n0,1,0.5,1,extra\n"))
+    {
+        std::cerr << "Expected malformed route with extra field to fail deserialize.\n";
+        return false;
+    }
+
+    if (matrix.deserialize ("schema=1\nroutes=1\n0,1,not-a-float,1\n"))
+    {
+        std::cerr << "Expected malformed float to fail deserialize.\n";
+        return false;
+    }
+
+    if (! routesEqual (matrix.getRoutes(), originalRoutes))
+    {
+        std::cerr << "Malformed route lines should not mutate routes.\n";
+        return false;
+    }
+
+    return true;
+}
+
+bool testDeserializeRejectsOutOfRangeEnums()
+{
+    ModulationMatrix matrix;
+    matrix.addRoute ({ Source::ampEnv, Destination::amp, 1.0f, false });
+    const auto originalRoutes = matrix.getRoutes();
+
+    if (matrix.deserialize ("schema=1\nroutes=1\n-1,0,0.1,0\n"))
+    {
+        std::cerr << "Expected negative source enum to fail deserialize.\n";
+        return false;
+    }
+
+    if (matrix.deserialize ("schema=1\nroutes=1\n99,0,0.1,0\n"))
+    {
+        std::cerr << "Expected out-of-range source enum to fail deserialize.\n";
+        return false;
+    }
+
+    if (matrix.deserialize ("schema=1\nroutes=1\n0,-1,0.1,0\n"))
+    {
+        std::cerr << "Expected negative destination enum to fail deserialize.\n";
+        return false;
+    }
+
+    if (matrix.deserialize ("schema=1\nroutes=1\n0,99,0.1,0\n"))
+    {
+        std::cerr << "Expected out-of-range destination enum to fail deserialize.\n";
+        return false;
+    }
+
+    if (! routesEqual (matrix.getRoutes(), originalRoutes))
+    {
+        std::cerr << "Out-of-range enums should not mutate routes.\n";
+        return false;
+    }
+
+    return true;
+}
 } // namespace
 
 int main()
@@ -150,6 +295,18 @@ int main()
         return 1;
 
     if (! testSerializationRoundTrip())
+        return 1;
+
+    if (! testDeserializeRejectsMalformedHeader())
+        return 1;
+
+    if (! testDeserializeRejectsMismatchedRouteCount())
+        return 1;
+
+    if (! testDeserializeRejectsMalformedRouteLines())
+        return 1;
+
+    if (! testDeserializeRejectsOutOfRangeEnums())
         return 1;
 
     std::cout << "Modulation tests passed\n";

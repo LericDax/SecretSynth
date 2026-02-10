@@ -1,7 +1,9 @@
 #include "Modulation.h"
 
 #include <algorithm>
+#include <charconv>
 #include <cmath>
+#include <cstdlib>
 #include <sstream>
 
 namespace secretsynth::dsp::mod
@@ -13,6 +15,61 @@ constexpr float twoPi = 6.28318530717958647692f;
 std::uint32_t secondsToSamples (float seconds, double sampleRate) noexcept
 {
     return static_cast<std::uint32_t> (std::max (1.0, std::round (std::max (0.0f, seconds) * sampleRate)));
+}
+
+bool parseUnsigned (std::string_view text, std::size_t& value) noexcept
+{
+    value = 0;
+    if (text.empty())
+        return false;
+
+    const auto* begin = text.data();
+    const auto* end = begin + text.size();
+    auto parsedValue = std::size_t {};
+    const auto result = std::from_chars (begin, end, parsedValue);
+    if (result.ec != std::errc {} || result.ptr != end)
+        return false;
+
+    value = parsedValue;
+    return true;
+}
+
+bool parseInt (std::string_view text, int& value) noexcept
+{
+    value = 0;
+    if (text.empty())
+        return false;
+
+    const auto* begin = text.data();
+    const auto* end = begin + text.size();
+    auto parsedValue = int {};
+    const auto result = std::from_chars (begin, end, parsedValue);
+    if (result.ec != std::errc {} || result.ptr != end)
+        return false;
+
+    value = parsedValue;
+    return true;
+}
+
+bool parseFloatStrict (std::string_view text, float& value) noexcept
+{
+    value = 0.0f;
+    if (text.empty())
+        return false;
+
+    std::string token (text);
+    char* end = nullptr;
+    errno = 0;
+    const auto parsedValue = std::strtof (token.c_str(), &end);
+    if (errno == ERANGE)
+        return false;
+    if (end == nullptr || end != token.c_str() + token.size())
+        return false;
+    if (! std::isfinite (parsedValue))
+        return false;
+
+    value = parsedValue;
+    return true;
 }
 } // namespace
 
@@ -291,20 +348,28 @@ bool ModulationMatrix::deserialize (std::string_view text)
     if (! std::getline (stream, line) || line.rfind ("schema=", 0) != 0)
         return false;
 
-    const auto parsedSchema = std::stoul (line.substr (7));
+    std::size_t parsedSchema = 0;
+    if (! parseUnsigned (line.substr (7), parsedSchema))
+        return false;
+
     if (parsedSchema != schemaVersion)
         return false;
 
     if (! std::getline (stream, line) || line.rfind ("routes=", 0) != 0)
         return false;
 
-    const auto routeCount = static_cast<std::size_t> (std::stoul (line.substr (7)));
+    std::size_t routeCount = 0;
+    if (! parseUnsigned (line.substr (7), routeCount))
+        return false;
 
     std::vector<Route> parsedRoutes;
     parsedRoutes.reserve (routeCount);
 
-    while (std::getline (stream, line) && ! line.empty())
+    for (std::size_t routeIndex = 0; routeIndex < routeCount; ++routeIndex)
     {
+        if (! std::getline (stream, line) || line.empty())
+            return false;
+
         std::istringstream lineStream (line);
         std::string token;
         std::array<std::string, 4> fields;
@@ -316,15 +381,37 @@ bool ModulationMatrix::deserialize (std::string_view text)
             fields[i] = token;
         }
 
+        if (std::getline (lineStream, token, ','))
+            return false;
+
+        int sourceIndex = 0;
+        int destinationIndex = 0;
+        float depth = 0.0f;
+        int bipolarFlag = 0;
+
+        if (! parseInt (fields[0], sourceIndex))
+            return false;
+        if (! parseInt (fields[1], destinationIndex))
+            return false;
+        if (! parseFloatStrict (fields[2], depth))
+            return false;
+        if (! parseInt (fields[3], bipolarFlag))
+            return false;
+
+        if (sourceIndex < 0 || sourceIndex >= static_cast<int> (Source::count))
+            return false;
+        if (destinationIndex < 0 || destinationIndex >= static_cast<int> (Destination::count))
+            return false;
+
         Route route;
-        route.source = static_cast<Source> (std::stoi (fields[0]));
-        route.destination = static_cast<Destination> (std::stoi (fields[1]));
-        route.depth = std::stof (fields[2]);
-        route.bipolar = std::stoi (fields[3]) != 0;
+        route.source = static_cast<Source> (sourceIndex);
+        route.destination = static_cast<Destination> (destinationIndex);
+        route.depth = depth;
+        route.bipolar = bipolarFlag != 0;
         parsedRoutes.push_back (route);
     }
 
-    if (parsedRoutes.size() != routeCount)
+    if (std::getline (stream, line))
         return false;
 
     routes = std::move (parsedRoutes);
