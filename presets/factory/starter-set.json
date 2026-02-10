@@ -1,0 +1,17 @@
+{
+  "name": "SecretSynth Starter Set",
+  "description": "Internal dogfooding subset of 10 presets before full factory bank freeze.",
+  "count": 10,
+  "presets": [
+    "bass_01_sub-anchor.synthpreset",
+    "bass_07_low-plucker.synthpreset",
+    "pluck_01_glass-pick.synthpreset",
+    "pluck_07_steel-dot.synthpreset",
+    "keys_01_soft-ep.synthpreset",
+    "keys_07_hammer-tone.synthpreset",
+    "pad_01_cloud-wash.synthpreset",
+    "pad_07_warm-bloom.synthpreset",
+    "fx_01_riser-thin.synthpreset",
+    "fx_07_glitch-ping.synthpreset"
+  ]
+}
