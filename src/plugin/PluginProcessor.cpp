@@ -1,8 +1,15 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+#include <cmath>
+
 namespace secretsynth::plugin
 {
+float SecretSynthAudioProcessor::softLimit (float sample) noexcept
+{
+    return std::tanh (sample);
+}
+
 SecretSynthAudioProcessor::SecretSynthAudioProcessor()
     : AudioProcessor (BusesProperties().withOutput ("Output", juce::AudioChannelSet::stereo(), true))
 {
@@ -41,6 +48,19 @@ void SecretSynthAudioProcessor::prepareToPlay (double sampleRate, int)
     oscillator.setPdShape (0.5f);
     oscillator.setMix (1.0f);
     oscillator.setQualityMode (secretsynth::dsp::osc::PhaseWarpOscillator::QualityMode::high);
+
+    filter.prepare (sampleRate);
+    filter.reset();
+    filter.setMode (secretsynth::dsp::filter::MultiModeFilter::Mode::lowPass);
+    filter.setCutoffHz (1800.0f);
+    filter.setResonance (0.6f);
+    filter.setKeyTracking (0.5f);
+    filter.setKeyTrackingReferenceHz (440.0f);
+
+    filterPosition = FilterPosition::postOscMix;
+    oscillatorMixGain = 1.0f;
+    activeVoices = 1;
+    lastKeyFrequencyHz = 220.0f;
 }
 
 void SecretSynthAudioProcessor::releaseResources() {}
@@ -74,9 +94,31 @@ void SecretSynthAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, 
         const auto destinations = modulationMatrix.process (sources);
         const auto pdAmountMod = destinations[static_cast<std::size_t> (secretsynth::dsp::mod::Destination::pdAmount)];
         const auto ampMod = destinations[static_cast<std::size_t> (secretsynth::dsp::mod::Destination::amp)];
+        const auto cutoffMod = destinations[static_cast<std::size_t> (secretsynth::dsp::mod::Destination::filterCutoff)];
+        activeVoices = (ampMod > 1.0e-4f ? 1 : 0);
 
         oscillator.setPdAmount (juce::jlimit (0.0f, 1.0f, 0.6f + pdAmountMod));
-        const auto value = oscillator.renderSample() * 0.1f * juce::jlimit (0.0f, 1.0f, ampMod);
+        filter.setCutoffHz (juce::jlimit (20.0f, 20000.0f, 1800.0f + 8000.0f * cutoffMod));
+
+        float oscillatorSample = oscillator.renderSample() * 0.1f;
+
+        if (activeVoices <= 0)
+        {
+            oscillatorSample = 0.0f;
+            filter.reset();
+        }
+
+        if (filterPosition == FilterPosition::preOscMix)
+            oscillatorSample = filter.processSample (oscillatorSample, lastKeyFrequencyHz);
+
+        const auto mixed = oscillatorSample * oscillatorMixGain;
+
+        float filtered = mixed;
+        if (filterPosition == FilterPosition::postOscMix)
+            filtered = filter.processSample (mixed, lastKeyFrequencyHz);
+
+        const auto amped = filtered * juce::jlimit (0.0f, 1.0f, ampMod);
+        const auto value = (activeVoices > 0 ? softLimit (amped) : 0.0f);
 
         for (int channel = 0; channel < buffer.getNumChannels(); ++channel)
             buffer.setSample (channel, sample, value);

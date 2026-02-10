@@ -1,6 +1,7 @@
 #pragma once
 
 #include <juce_audio_processors/juce_audio_processors.h>
+#include "../dsp/filter/MultiModeFilter.h"
 #include "../dsp/osc/PhaseWarpOscillator.h"
 #include "../dsp/mod/Modulation.h"
 
@@ -38,9 +39,23 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 private:
+    enum class FilterPosition
+    {
+        preOscMix,
+        postOscMix
+    };
+
+    static float softLimit (float sample) noexcept;
+
     secretsynth::dsp::osc::PhaseWarpOscillator oscillator;
+    secretsynth::dsp::filter::MultiModeFilter filter;
     secretsynth::dsp::mod::ModulationMatrix modulationMatrix;
     secretsynth::dsp::mod::ModulationEngine modulationEngine;
+
+    FilterPosition filterPosition { FilterPosition::postOscMix };
+    float oscillatorMixGain { 1.0f };
+    int activeVoices { 0 };
+    float lastKeyFrequencyHz { 220.0f };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SecretSynthAudioProcessor)
 };
